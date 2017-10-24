@@ -1,2 +1,3 @@
 # Swish layer
-    Y = X * Sigmoid(X)
+1. Y = X * Sigmoid(X)
+2. Better activate function than ReLU
