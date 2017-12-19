@@ -19,6 +19,10 @@ void SwishLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   Dtype* top_data = top[0]->mutable_gpu_data();
   const int count = bottom[0]->count();
   // NOLINT_NEXT_LINE(whitespace/operators)
+  // For in-place computation
+  if (top[0] == bottom[0]) {
+    caffe_copy(count, bottom_data, bottom_memory_.mutable_gpu_data());
+  }
   SwishForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
       count, bottom_data, top_data);
   CUDA_POST_KERNEL_CHECK;
@@ -48,6 +52,10 @@ void SwishLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const Dtype* bottom_data = bottom[0]->gpu_data();
     const Dtype* top_diff = top[0]->gpu_diff();
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
+    // For in-place computation
+    if (top[0] == bottom[0]) {
+      bottom_data = bottom_memory_.gpu_data();
+    }
     const int count = bottom[0]->count();
     // NOLINT_NEXT_LINE(whitespace/operators)
     SwishBackward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
